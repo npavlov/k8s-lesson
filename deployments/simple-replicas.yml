@@ -1,0 +1,28 @@
+#-------------------------------------------------------------
+# Manifest File to create Simple Deployment with Labels
+#
+# Copyright (c) by Nikita Pavlov
+#-------------------------------------------------------------
+apiVersion : apps/v1
+kind: Deployment
+metadata:
+  name: ci-test-deployment-replicas
+  labels:
+    app : ci-test-app
+    env : prod
+    owner : NikitaPavlov
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      project: ci-test-replica
+  template:
+    metadata:
+      labels:
+        project: ci-test-replica
+    spec:
+      containers:
+        - name : ci-test-app
+          image: nikpav/ci-test-app:v1
+          ports:
+            - containerPort: 80
