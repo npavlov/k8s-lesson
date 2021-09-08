@@ -2,6 +2,10 @@
 
 ### С чего начать
 
+Список команд minikube
+
+https://minikube.sigs.k8s.io/docs/commands/
+
 Ставим minikube
 
 `brew install minikube`
@@ -50,34 +54,52 @@ kubectl get rs,pods,service`
 
 ### Создание нового Deployment
 
+Разворачиваем новый deployment из файла, 1 под
+
+`kubectl apply -f ./deployments/simple-deployment.yml`
+
+Разворачиваем новый deployment из файла, c репликами, 3 пода
+
+`kubectl apply -f ./deployments/simple-replicas.yml`
+
+`replicas: 3` регулируем через этот параметр
+
+Разворачиваем новый deployment с HPA (HorizontalPodAutoScale)
+
+`kubectl apply -f ./deployments/simple-autoscaling.yml`
+
+AutoScaling реализуется через вторую часть файла, разворачивается HPA
+
+минимум 2 pods, максимум 6, утилизация (барьер) CPU - 70%, RAM - 80%
+
 Команды
 
 `kubectl get rc` - проверить наличие Replication Controller и настройки с которыми задана репликация
 
 `kubectl get hpa` - Показать все HPA - HorizontalPodAutoScalers
 
-`kubectl create deployment denis-deployment --image httpd:latest`	Создать Deployment из DockerImage httpd:latest
+`kubectl create deployment ci-app-test-deployment --image httpd:latest`	Создать Deployment из DockerImage httpd:latest
 
-`kubectl describe deplyoments denis-deployment`	Показать все данные о Deployments denis-deployment
+`kubectl describe deplyoments ci-app-test-deployment`	Показать все данные о Deployments denis-deployment
 
-`kubectl scale deployment denis-deployment --replicas 4`	Создать ReplicaSets
+`kubectl scale deployment ci-app-test-deployment --replicas 4`	Создать ReplicaSets
 
-`kubectl autoscale deployment denis  --min=10 --max=15 --cpu-percent=80`	Создать AutoScaling для Deployment denis
+`kubectl autoscale deployment ci-app-test-deployment  --min=10 --max=15 --cpu-percent=80`	Создать AutoScaling для Deployment denis
 
 `kubectl get hpa`	Показать все HPA - HorizontalAutoScalers
 
-`kubectl set image deployment/denis-deployment k8sphp=adv4000/k8sphp:version2 --record`	Заменить Deployment denis-deployment Image на новый
+`kubectl set image deployment/ci-app-test-deployment k8sphp=adv4000/k8sphp:version2 --record`	Заменить Deployment denis-deployment Image на новый
 
-`kubectl rollout status deployment/denis-deployment` 	Показать статус Обновления
+`kubectl rollout status deployment/ci-app-test-deployment` 	Показать статус Обновления
 
-`kubectl rollout history deployment/denis-deployment`	Показать историю Обновлении
+`kubectl rollout history deployment/ci-app-test-deployment`	Показать историю Обновлении
 
-`kubectl rollout undo deployment/denis-deployment` 	Вернуться на предидущую версию
+`kubectl rollout undo deployment/ci-app-test-deployment` 	Вернуться на предидущую версию
 
-`kubectl rollout undo deployment/denis-deployment --to-revision=2`	Вернуться на указанную версию
+`kubectl rollout undo deployment/ci-app-test-deployment --to-revision=2`	Вернуться на указанную версию
 
-`kubectl rollout restart deployment/denis-deployment` 	Передеплоить текущую версию (скачивает заново DockerImage с тегом latest)
+`kubectl rollout restart deployment/ci-app-test-deployment` 	Передеплоить текущую версию (скачивает заново DockerImage с тегом latest)
 
-`kubectl delete deployments denis-deployment` 	Стереть Deployment denis-deployment 
+`kubectl delete deployments ci-app-test-deployment` 	Стереть Deployment denis-deployment 
 
 
