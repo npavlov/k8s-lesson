@@ -102,4 +102,16 @@ AutoScaling реализуется через вторую часть файла
 
 `kubectl delete deployments ci-app-test-deployment` 	Стереть Deployment denis-deployment 
 
+### Создание нового Service
 
+`kubectl expose deployment ci-test-deployment-autoscaled --type=LoadBalancer --port=80`
+
+где ci-test-deployment-autoscaled - имя Deployment
+--type=LoadBalancer - тип Service, в данном случае LoadBalancer
+--port=80 - порт к которому будет обращаться в подах
+
+Для типа LoadBalancer нужно выполнить команды
+`minikube addons enable ingress` - включает ingress
+`minikube tunnel` - пробивает туннель
+
+`➜ kubectl apply -f ./services/service-loadbalancer-two-images.yml` - развертывание Service + HPA + Deployment

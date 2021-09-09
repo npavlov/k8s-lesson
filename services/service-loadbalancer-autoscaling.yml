@@ -1,0 +1,69 @@
+#-------------------------------------------------------------
+# Manifest File to create Simple Deployment with Labels
+#
+# Copyright (c) by Nikita Pavlov
+#-------------------------------------------------------------
+apiVersion : apps/v1
+kind: Deployment
+metadata:
+  name: ci-test-deployment-autoscaled
+  labels:
+    app : ci-test-app
+spec:
+  selector:
+    matchLabels:
+      project: ci-test-autoscaled
+  template:
+    metadata:
+      labels:
+        project: ci-test-autoscaled # Service will look for Pods with this label
+    spec:
+      containers:
+        - name : ci-test-app
+          image: nikpav/ci-test-app:v1
+          ports:
+            - containerPort: 80
+
+---
+apiVersion: autoscaling/v2beta2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: my-autoscaling
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v2beta1v1
+    kind: Deployment
+    name: ci-test-deployment-autoscaled
+  minReplicas: 2
+  maxReplicas: 6
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 80
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-single-pod-service
+  labels:
+    env  : prod
+    owner: NikitaPavlov
+spec:
+  selector:
+    project: ci-test-autoscaled    # Selecting PODS with those Labels
+  ports:
+    - name      : app-listener
+      protocol  : TCP
+      port      : 80  # Port on Load Balancer
+      targetPort: 80  # Port on POD
+  type: LoadBalancer
