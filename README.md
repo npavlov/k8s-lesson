@@ -45,10 +45,10 @@ kubectl get rs,pods,service`
 
 ### Создание нового Pod
 
-Например для развертывания Pods 
+Например, для развертывания Pods 
 мы будем использовать команду `kubectl apply -f ./pods/pod-file.yml`
 
-Для проброса порта с хостовой машина на порт внутри pod мы используем команду `kubectl port-forward my-web 8888:80`
+Для проброса порта с хостовой машины на порт внутри pod мы используем команду `kubectl port-forward my-web 8888:80`
 
 Где my-web имя пода, 8888 - внешний порт на хосте и 80 внутренний порт на поде
 
@@ -70,7 +70,7 @@ kubectl get rs,pods,service`
 
 AutoScaling реализуется через вторую часть файла, разворачивается HPA
 
-минимум 2 pods, максимум 6, утилизация (барьер) CPU - 70%, RAM - 80%
+Минимум 2 pods, максимум 6, утилизация (барьер) CPU - 70%, RAM - 80%
 
 Команды
 
@@ -115,3 +115,15 @@ AutoScaling реализуется через вторую часть файла
 `minikube tunnel` - пробивает туннель
 
 `➜ kubectl apply -f ./services/service-loadbalancer-two-images.yml` - развертывание Service + HPA + Deployment
+
+### Ingress Controller
+
+Что делаем для старта:
+
+`minikube addons enable ingress` - включает ingress
+
+`kubectl get pods -n kube-system | grep nginx-ingress-controller` - проверяем что Ingress контроллер запустился
+
+`kubectl apply -f ./ingress/ingress-hosts.yml` - запускаем Deployment, создаем ClusterIP и Ingress Controller   
+
+`kubectl get ingress` - получаем инстананс Ingress

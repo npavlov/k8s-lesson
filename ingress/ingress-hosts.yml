@@ -1,0 +1,125 @@
+#-------------------------------------------------------------
+# Manifest File to create Simple Deployment with Labels
+#
+# Copyright (c) by Nikita Pavlov
+#-------------------------------------------------------------
+apiVersion : apps/v1
+kind: Deployment
+metadata:
+  name: ci-test-deployment-autoscaled
+  labels:
+    app : ci-test-app
+spec:
+  selector:
+    matchLabels:
+      project: ci-test-autoscaled
+  template:
+    metadata:
+      labels:
+        project: ci-test-autoscaled # Service will look for Pods with this label
+    spec:
+      containers:
+        - name : ci-test-app
+          image: nikpav/ci-test-app:v1
+          ports:
+            - containerPort: 80
+        - name: tomcat
+          image: tomcat:8.5.38
+          ports:
+            - containerPort: 8080
+
+---
+apiVersion: autoscaling/v2beta2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: my-autoscaling
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v2beta1v1
+    kind: Deployment
+    name: ci-test-deployment-autoscaled
+  minReplicas: 2
+  maxReplicas: 6
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 80
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: service-app
+  labels:
+    env  : prod
+    owner: NikitaPavlov
+spec:
+  selector:
+    project: ci-test-autoscaled    # Selecting PODS with those Labels
+  ports:
+    - name      : app-listener
+      protocol  : TCP
+      port      : 80  # Port on Service
+      targetPort: 80  # Port on POD
+  type: ClusterIP
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: service-tomcat
+  labels:
+    env  : prod
+    owner: NikitaPavlov
+spec:
+  selector:
+    project: ci-test-autoscaled    # Selecting PODS with those Labels
+  ports:
+    - name      : app-listener-for-tomcat
+      protocol  : TCP
+      port      : 8080  # Port on Service
+      targetPort: 8080  # Port on POD
+  type: ClusterIP
+
+
+---
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-hosts
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
+
+spec:
+  rules:
+    - host: fake.myaddress.com
+      http:
+        paths:
+          - pathType: Prefix
+            path: /
+            backend:
+              service:
+                name: service-app
+                port:
+                  number: 80
+
+    - host: web.myaddress.com
+      http:
+        paths:
+          - pathType: Prefix
+            path: /
+            backend:
+              service:
+                name: service-tomcat
+                port:
+                  number: 8080
