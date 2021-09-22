@@ -1,0 +1,29 @@
+#-------------------------------------------------------------
+# Manifest File to create Simple Deployment with Labels
+#
+# Copyright (c) by Nikita Pavlov
+#-------------------------------------------------------------
+apiVersion : apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-deployment
+  labels:
+    app : {{ .Release.Name }}-deployment
+spec:
+  selector:
+    matchLabels:
+      project: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        project: {{ .Release.Name }} # Service will look for Pods with this label
+    spec:
+      containers:
+        - name : {{ .Release.Name }}-app
+          image: {{ .Values.container.image }}
+          ports:
+            - containerPort: 80
+        - name: {{ .Release.Name }}-tomcat
+          image: tomcat:8.5.38
+          ports:
+            - containerPort: 8080

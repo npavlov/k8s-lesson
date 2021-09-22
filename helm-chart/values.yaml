@@ -1,0 +1,5 @@
+container:
+  image: nikpav/ci-test-app:v1
+
+replicaCountMin: 2
+replicaCountMax: 6

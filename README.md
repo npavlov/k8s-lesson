@@ -126,4 +126,30 @@ AutoScaling реализуется через вторую часть файла
 
 `kubectl apply -f ./ingress/ingress-hosts.yml` - запускаем Deployment, создаем ClusterIP и Ingress Controller   
 
-`kubectl get ingress` - получаем инстананс Ingress
+`kubectl get ingress` - получаем Ingress instance
+
+### Helm Chart
+
+`minikube start --nodes 2` - создаем инстанс K8s
+
+`minikube addons enable ingress` - включаем ingress
+
+`minikube addons enable ingress-dns` - включаем ingress dns
+
+`minikube addons list` - проверяем какие аддоны мы включили
+
+`helm install app helm-chart` - устанавливаем наш helm chart на K8s
+
+`helm list` - проверяем список deployed Helm Chart
+
+`kubectl get pods` - проверяем что создались Pods
+
+`kubectl get svc` - проверяем что создались Service по балансированию наших приложений внутри Pods
+
+`kubectl get ingress` - проверяем что создался Ingress instance
+
+`kubectl describe ingress ingress-hosts` - проверяем статус его развертывания
+
+`kubectl get hpa` - проверяем что создался Horizontal Pod AutoScales
+
+`helm upgrade app helm-chart` - для обновления нашего Helm Deployment
